@@ -2,81 +2,91 @@
     {
         "id": 1,
         "player": "Joel Embiid",
-        "ppg": 33.1,
+        "ppg": 33.0,
         "apg": 4.2,
         "rpg": 10.2,
-        "team": "Philadelphia 76ers"
+        "team": "Philadelphia 76ers",
+        "pos": "C"
     },
     {
         "id": 2,
         "player": "Luka Dončić",
         "ppg": 32.4,
-        "apg": 8.6,
+        "apg": 8.0,
         "rpg": 8.6,
-        "team": "Dallas Mavericks"
+        "team": "Dallas Mavericks",
+        "pos": "PG"
     },
     {
         "id": 3,
-        "player": "Damian Lillard",
-        "ppg": 32.2,
-        "apg": 7.3,
-        "rpg": 4.8,
-        "team": "Portland Trail Blazers"
-    },
-    {
-        "id": 4,
         "player": "Giannis Antetokounmpo",
         "ppg": 31.1,
         "apg": 5.7,
         "rpg": 11.8,
-        "team": "Milwaukee Bucks"
+        "team": "Milwaukee Bucks",
+        "pos": "PF"
     },
     {
-        "id": 5,
+        "id": 4,
         "player": "Jayson Tatum",
         "ppg": 30.0,
         "apg": 4.6,
-        "rpg": 8.8,
-        "team": "Boston Celtics"
+        "rpg": 8.0,
+        "team": "Boston Celtics",
+        "pos": "SF"
+    },
+    {
+        "id": 5,
+        "player": "Stephen Curry",
+        "ppg": 29.4,
+        "apg": 6.3,
+        "rpg": 6.1,
+        "team": "Golden State Warriors",
+        "pos": "PG"
     },
     {
         "id": 6,
         "player": "Kevin Durant",
         "ppg": 29.1,
-        "apg": 6.7,
-        "rpg": 6.4,
-        "team": "Phoenix Suns"
+        "apg": 5.0,
+        "rpg": 6.7,
+        "team": "Phoenix Suns",
+        "pos": "SF"
     },
     {
         "id": 7,
-        "player": "Donovan Mitchell",
-        "ppg": 28.3,
-        "apg": 4.4,
-        "rpg": 4.3,
-        "team": "Cleveland Cavaliers"
+        "player": "Damian Lillard",
+        "ppg": 32.2,
+        "apg": 7.3,
+        "rpg": 4.8,
+        "team": "Portland Trail Blazers",
+        "pos": "PG"
     },
     {
         "id": 8,
-        "player": "LeBron James",
-        "ppg": 28.9,
-        "apg": 6.8,
-        "rpg": 8.3,
-        "team": "Los Angeles Lakers"
+        "player": "Nikola Jokić",
+        "ppg": 26.5,
+        "apg": 8.0,
+        "rpg": 13.8,
+        "team": "Denver Nuggets",
+        "pos": "C"
     },
     {
         "id": 9,
-        "player": "Kyrie Irving",
-        "ppg": 27.0,
-        "apg": 5.0,
-        "rpg": 5.1,
-        "team": "Dallas Mavericks"
+        "player": "James Harden",
+        "ppg": 24.6,
+        "apg": 10.5,
+        "rpg": 6.1,
+        "team": "Philadelphia 76ers",
+        "pos": "SG"
     },
     {
         "id": 10,
-        "player": "Nikola Jokić",
-        "ppg": 24.5,
-        "apg": 9.8,
-        "rpg": 11.8,
-        "team": "Denver Nuggets"
+        "player": "Kawhi Leonard",
+        "ppg": 23.8,
+        "apg": 4.4,
+        "rpg": 6.5,
+        "team": "Los Angeles Clippers",
+        "pos": "SF"
     }
 ]

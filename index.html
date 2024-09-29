@@ -7,7 +7,41 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="container">
+
+    <div id="settings-form" class="form-container">
+        <h2>Setup Your Auction</h2>
+        <form id="auction-settings">
+            <label for="league-size">League Size:</label>
+            <select id="league-size" required>
+                <option value="">Select League Size</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
+                <option value="11">11</option>
+                <option value="12">12</option>
+                <option value="13">13</option>
+                <option value="14">14</option>
+                <option value="15">15</option>
+                <option value="16">16</option>
+                <option value="17">17</option>
+                <option value="18">18</option>
+                <option value="19">19</option>
+                <option value="20">20</option>
+            </select>
+    
+            <label for="live-players">Players in League:</label>
+            <select id="live-players" required>
+                <option value="">Select Participant Amount</option>
+            </select>
+            <button type="submit">Start Auction</button>
+        </form>
+    </div>
+
+    <div class="container hidden" id="auction-interface">
         <h1>Player Bids</h1>
         <div id="player-cards" class="player-cards"></div>
     </div>
