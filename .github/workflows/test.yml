@@ -20,5 +20,5 @@ jobs:
     - name: Install dependencies
       run: npm install
 
-    - name: Run data handling tests
-      run: node tests/jsonDataHandling.test.js
+    - name: Run tests
+      run: npm test
