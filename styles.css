@@ -10,10 +10,52 @@ body {
     margin: auto;
 }
 
+.nominee-display {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 200px;
+    height: 200px;
+    background-color: lightgrey;
+    border: 1px solid #ccc;
+    padding: 10px;
+    box-sizing: border-box;
+    z-index: 10;
+}
+
+
+.timer {
+    width: 50px;  
+    height: 50px; 
+    background-color: #007BFF;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 5px;
+}
+
+.current-participant {
+    flex-grow: 1; 
+    margin-left: 20px; 
+}
+
+.draft-notification {
+    position: absolute;
+    top: 200px; 
+    left: 0;
+    width: 100%;
+    background-color: #007BFF; 
+    color: white;
+    text-align: center;
+    padding: 10px 0;
+}
+
 .player-cards {
     display: flex;
     flex-direction: column;
     gap: 10px;
+    margin-top: 250px;
 }
 
 .card {
