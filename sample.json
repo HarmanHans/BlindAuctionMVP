@@ -5,7 +5,7 @@
         "ppg": 33.0,
         "apg": 4.2,
         "rpg": 10.2,
-        "team": "Philadelphia 76ers",
+        "team": "PHI",
         "pos": "C"
     },
     {
@@ -14,7 +14,16 @@
         "ppg": 32.4,
         "apg": 8.0,
         "rpg": 8.6,
-        "team": "Dallas Mavericks",
+        "team": "DAL",
+        "pos": "PG"
+    },
+    {
+        "id": 7,
+        "player": "Damian Lillard",
+        "ppg": 32.2,
+        "apg": 7.3,
+        "rpg": 4.8,
+        "team": "POR",
         "pos": "PG"
     },
     {
@@ -23,7 +32,7 @@
         "ppg": 31.1,
         "apg": 5.7,
         "rpg": 11.8,
-        "team": "Milwaukee Bucks",
+        "team": "MIL",
         "pos": "PF"
     },
     {
@@ -32,7 +41,7 @@
         "ppg": 30.0,
         "apg": 4.6,
         "rpg": 8.0,
-        "team": "Boston Celtics",
+        "team": "BOS",
         "pos": "SF"
     },
     {
@@ -41,7 +50,7 @@
         "ppg": 29.4,
         "apg": 6.3,
         "rpg": 6.1,
-        "team": "Golden State Warriors",
+        "team": "GSW",
         "pos": "PG"
     },
     {
@@ -50,17 +59,8 @@
         "ppg": 29.1,
         "apg": 5.0,
         "rpg": 6.7,
-        "team": "Phoenix Suns",
+        "team": "PHX",
         "pos": "SF"
-    },
-    {
-        "id": 7,
-        "player": "Damian Lillard",
-        "ppg": 32.2,
-        "apg": 7.3,
-        "rpg": 4.8,
-        "team": "Portland Trail Blazers",
-        "pos": "PG"
     },
     {
         "id": 8,
@@ -68,7 +68,7 @@
         "ppg": 26.5,
         "apg": 8.0,
         "rpg": 13.8,
-        "team": "Denver Nuggets",
+        "team": "DEN",
         "pos": "C"
     },
     {
@@ -77,7 +77,7 @@
         "ppg": 24.6,
         "apg": 10.5,
         "rpg": 6.1,
-        "team": "Philadelphia 76ers",
+        "team": "PHI",
         "pos": "SG"
     },
     {
@@ -86,7 +86,7 @@
         "ppg": 23.8,
         "apg": 4.4,
         "rpg": 6.5,
-        "team": "Los Angeles Clippers",
+        "team": "LAC",
         "pos": "SF"
     }
 ]

@@ -29,6 +29,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const TOTAL_BUDGET = 200;
     const leagueSizeSelect = document.getElementById('league-size');
     const livePlayersSelect = document.getElementById('live-players');
+    let timer;
 
     class Participant {
         constructor(name) {
@@ -79,8 +80,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         document.getElementById('settings-form').classList.add('hidden');
         document.getElementById('auction-interface').classList.remove('hidden');
-        
-        console.log(`League Size: ${leagueSize}, Players in League: ${livePlayers}`);
 
         const participants = [];
         const orderingParticipants = Array.from({length: leagueSize}, (_, i) => `Participant ${i + 1}`);
@@ -101,17 +100,43 @@ document.addEventListener("DOMContentLoaded", () => {
         return array;
     }
 
-    function startAuction(array) {
+    async function startAuction(array) {
         const round = 1;
-        enableNomination();
+        updatePlayerNominated();
+        updateTable(array);
         for (let i = 0; i < ROSTER_SIZE; i++) {
             for (let j = 0; j < array.length; j++) {
-                console.log((`It is ${array[j].name}'s turn to nominate.`));
                 updateNominationText(array[j].name);
+                startTimer(NOMINATION_TIME);
+                await waitForNomination();
+                startTimer(BIDDING_TIME);
                 
             }
         }
         
+    }
+
+    function updateTable(array) {
+        const tableHeader = document.getElementById('table-header');
+        const tableBody = document.getElementById('table-body');
+
+        tableHeader.innerHTML = '';
+        tableBody.innerHTML = '';
+
+        for (let i = 0; i < array.length; i++) {
+            const th = document.createElement('th');
+            th.innerText = `${array[i].name}`;
+            tableHeader.appendChild(th);
+        }
+
+        for (let i = 0; i < ROSTER_SIZE; i++) {
+            const tr = document.createElement('tr');
+            for (let j = 1; j <= array.length; j++) {
+                const td = document.createElement('td');
+                tr.appendChild(td);
+            }
+        tableBody.appendChild(tr);
+        }
     }
 
     function updateNominationText(String) {
@@ -119,15 +144,62 @@ document.addEventListener("DOMContentLoaded", () => {
         notif.innerText = `It is ${String}'s turn to nominate.`
     }
 
-    function enableNomination() {
+    function updatePlayerNominated() {
         const playerCardsContainer = document.getElementById('player-cards');
         playerCardsContainer.addEventListener('click', (event) => {
             if (event.target.matches('.nominate-button')) {
                 const playerId = Number(event.target.getAttribute('data-player-id'));
                 const nominatedPlayer = dataset.find(dataset => dataset.id === playerId);
-                console.log('Nominated:', nominatedPlayer);
+                const heading = document.querySelector('.nominated-player-display h1');
+                heading.innerText = `${nominatedPlayer.player} | ${nominatedPlayer.team}`;
+                const positions = document.querySelector('.nominated-player-display p');
+                positions.innerText = nominatedPlayer.pos;
             }
         });
     }
 
+    function waitForNomination() {
+        return new Promise((resolve) => {
+            const playerCardsContainer = document.getElementById('player-cards');
+            
+            const nominationHandler = (event) => {
+                if (event.target.matches('.nominate-button')) {
+                    playerCardsContainer.removeEventListener('click', nominationHandler);
+                    clearInterval(timer);
+                    startBid();
+                    resolve();
+                }
+            };
+    
+            playerCardsContainer.addEventListener('click', nominationHandler);
+        });
+    }
+
+    function startTimer(seconds) {
+        let timeLeft = seconds;
+        timer = setInterval(() => {
+            if (timeLeft <= 0) {
+                clearInterval(timer);
+                // Handle timer expiration (e.g., end of turn)
+            } else {
+                timeLeft--;
+                const clock = document.querySelector('#timer p');
+                const formattedTime = `0:${timeLeft < 10 ? '0' : ''}${timeLeft}`;
+                clock.innerText = formattedTime;
+                if (timeLeft <= 6) {
+                    clock.style.color = 'red';
+                }
+            }
+        }, 1000);
+    }
+
+    function startBid() {
+        
+        console.log("buh");
+    }
+
+    /* TODO: need to implement draft order
+             populate team divs in order
+             non-GMs are bots
+    */
 });

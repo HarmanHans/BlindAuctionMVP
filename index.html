@@ -41,12 +41,28 @@
         </form>
     </div>
 
-
+    <div id="team-selections" class="team-selections">
+        <table id="roster-table">
+            <thead>
+                <tr id="table-header"></tr>
+            </thead>
+            <tbody id="table-body"></tbody>
+        </table>
+    </div>
     
     <div class="container hidden" id="auction-interface">
         <div id="nominee-display" class="nominee-display">
-            <div id="timer" class="timer"></div>
+            <div id="timer" class="timer">
+                <p></p>
+            </div>
             <div id="current-participant" class="current-participant"></div>
+        </div>
+        <div id="nominated-player-display" class="nominated-player-display">
+            <h1></h1>
+            <p></p>
+            <div id="bidding-display" class="bidding-display">
+                <input type="number" id="increment-input" value="1" min="0" />
+            </div>
         </div>
         <div id="draft-notification" class="draft-notification">
             Draft starting soon
