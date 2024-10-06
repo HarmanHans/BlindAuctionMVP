@@ -25,7 +25,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const ROSTER_SIZE = 13;
     const NOMINATION_TIME = 20;
-    const BIDDING_TIME = 20;
+    const BIDDING_TIME = 10;
     const TOTAL_BUDGET = 200;
     const leagueSizeSelect = document.getElementById('league-size');
     const livePlayersSelect = document.getElementById('live-players');
@@ -38,6 +38,7 @@ document.addEventListener("DOMContentLoaded", () => {
             this.draftees = 0;
             this.budget = TOTAL_BUDGET;
             this.roster = [];
+            this.currentBid = 0;
         }
 
         get playersLeft() {
@@ -48,12 +49,26 @@ document.addEventListener("DOMContentLoaded", () => {
             return this.budget - this.spent - this.playersLeft;
         }
 
-        addPlayer() {
-            draftees++;
+        addPlayer(id, bidAmount) {
+            this.draftees++;
+            const player = dataset.find(player => player.id === id);
+            this.roster.push({player, bid: bidAmount});
         }
 
         adjustBudget() {
             return this.maxBid;
+        }
+
+        placeBid(amount) {
+            if (amount <= this.maxBid) {
+                this.currentBid = amount;
+                return true;
+            }
+            return false;
+        }
+
+        resetBid() {
+            this.currentBid = 0;
         }
     }
 
@@ -101,22 +116,29 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     async function startAuction(array) {
-        const round = 1;
-        updatePlayerNominated();
-        updateTable(array);
+        console.log(array);
+        let round = 1;
+        initializeTable(array);
+
         for (let i = 0; i < ROSTER_SIZE; i++) {
             for (let j = 0; j < array.length; j++) {
                 updateNominationText(array[j].name);
                 startTimer(NOMINATION_TIME);
-                await waitForNomination();
-                startTimer(BIDDING_TIME);
-                
+                const id = await waitForNomination();
+                console.log('here');
+
+                for (let k = 0; k < array.length; k++) {
+                    /* await Promise.all(array.map((participant, k) => startBid(participant, playerId))); */
+                    await startBid(array[k]);
+                }   
+                selectHighestBid(array, id);
+                updateTable(array);
+                array.forEach(participant => participant.resetBid());
             }
         }
-        
     }
 
-    function updateTable(array) {
+    function initializeTable(array) {
         const tableHeader = document.getElementById('table-header');
         const tableBody = document.getElementById('table-body');
 
@@ -139,23 +161,22 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
+    function updateTable(participants) {
+        const tableBody = document.getElementById('table-body');
+
+        participants.forEach((participant, participantIndex) => {
+            participant.roster.forEach((playerData, rowIndex) => {
+                if (playerData) {
+                    const td = tableBody.rows[rowIndex].cells[participantIndex];
+                    td.innerText = `${playerData.player.player} $${playerData.bid}`;
+                }
+            })
+        })
+    }
+
     function updateNominationText(String) {
         const notif = document.getElementById('draft-notification');
         notif.innerText = `It is ${String}'s turn to nominate.`
-    }
-
-    function updatePlayerNominated() {
-        const playerCardsContainer = document.getElementById('player-cards');
-        playerCardsContainer.addEventListener('click', (event) => {
-            if (event.target.matches('.nominate-button')) {
-                const playerId = Number(event.target.getAttribute('data-player-id'));
-                const nominatedPlayer = dataset.find(dataset => dataset.id === playerId);
-                const heading = document.querySelector('.nominated-player-display h1');
-                heading.innerText = `${nominatedPlayer.player} | ${nominatedPlayer.team}`;
-                const positions = document.querySelector('.nominated-player-display p');
-                positions.innerText = nominatedPlayer.pos;
-            }
-        });
     }
 
     function waitForNomination() {
@@ -164,10 +185,15 @@ document.addEventListener("DOMContentLoaded", () => {
             
             const nominationHandler = (event) => {
                 if (event.target.matches('.nominate-button')) {
+                    const playerId = Number(event.target.getAttribute('data-player-id'));
+                    const nominatedPlayer = dataset.find(dataset => dataset.id === playerId);
+                    const heading = document.querySelector('.nominated-player-display h1');
+                    heading.innerText = `${nominatedPlayer.player} | ${nominatedPlayer.team}`;
+                    const positions = document.querySelector('.nominated-player-display p');
+                    positions.innerText = nominatedPlayer.pos;
                     playerCardsContainer.removeEventListener('click', nominationHandler);
                     clearInterval(timer);
-                    startBid();
-                    resolve();
+                    resolve(playerId);
                 }
             };
     
@@ -193,9 +219,31 @@ document.addEventListener("DOMContentLoaded", () => {
         }, 1000);
     }
 
-    function startBid() {
+    async function startBid(currentBidder) {
+        console.log(`Current bidder is ${currentBidder.name}`);
+        const bid = document.getElementById('bid-input');
+        const submitButton = document.getElementById('submit-bid');
+        let submitted = false;
+
+        startTimer(BIDDING_TIME);
         
-        console.log("buh");
+        return new Promise((resolve) => {
+            submitButton.onclick = () => {
+                const currentBidAmount = parseInt(bid.value) || 0;
+                console.log(currentBidAmount);
+                currentBidder.placeBid(currentBidAmount);
+                resolve();
+            };
+        });
+    }
+
+    function selectHighestBid(participants, id) {
+        const winner = participants.reduce((accumulator, participant) => {
+            return participant.currentBid > accumulator.currentBid ? participant : accumulator;
+        }, { currentBid: -1 });
+        winner.spent += winner.currentBid;
+        winner.addPlayer(id, winner.currentBid);
+        console.log(winner);
     }
 
     /* TODO: need to implement draft order
