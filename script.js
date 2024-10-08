@@ -1,3 +1,5 @@
+/*const { clearInterval } = require("timers"); */
+
 let dataset;
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -116,7 +118,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     async function startAuction(array) {
-        console.log(array);
         let round = 1;
         initializeTable(array);
 
@@ -124,14 +125,23 @@ document.addEventListener("DOMContentLoaded", () => {
             for (let j = 0; j < array.length; j++) {
                 updateNominationText(array[j].name);
                 startTimer(NOMINATION_TIME);
-                const id = await waitForNomination();
-                console.log('here');
+                toggleBidInputVisibility(false);
+                /*const id = await waitForNomination();*/
+                const id = await Promise.race([waitForNomination(), 
+                           new Promise((resolve) => setTimeout(() => resolve(null), NOMINATION_TIME * 1000))]);
+                
+                handleNomination(id);
+                toggleBidInputVisibility(true);
+                const nominator = array[j];
+                const bidders = [...array.slice(j+1), ...array.slice(0,j)];
+                
+                await startBid(nominator, true);
+                for (const bidder of bidders) {
+                    await startBid(bidder, false);
+                }
 
-                for (let k = 0; k < array.length; k++) {
-                    /* await Promise.all(array.map((participant, k) => startBid(participant, playerId))); */
-                    await startBid(array[k]);
-                }   
                 selectHighestBid(array, id);
+                console.log(array);
                 updateTable(array);
                 array.forEach(participant => participant.resetBid());
             }
@@ -147,7 +157,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         for (let i = 0; i < array.length; i++) {
             const th = document.createElement('th');
-            th.innerText = `${array[i].name}`;
+            th.innerText = `${array[i].name} $${TOTAL_BUDGET} ${ROSTER_SIZE - array[i].draftees}/${ROSTER_SIZE}`;
             tableHeader.appendChild(th);
         }
 
@@ -157,14 +167,18 @@ document.addEventListener("DOMContentLoaded", () => {
                 const td = document.createElement('td');
                 tr.appendChild(td);
             }
-        tableBody.appendChild(tr);
+            tableBody.appendChild(tr);
         }
     }
 
     function updateTable(participants) {
         const tableBody = document.getElementById('table-body');
+        const tableHeader = document.getElementById('table-header');
 
         participants.forEach((participant, participantIndex) => {
+            const th = tableHeader.children[participantIndex];
+            th.innerText = `${participant.name} $${TOTAL_BUDGET - participant.spent} 
+                                     $${participant.maxBid} ${ROSTER_SIZE - participant.draftees}/${ROSTER_SIZE}`;
             participant.roster.forEach((playerData, rowIndex) => {
                 if (playerData) {
                     const td = tableBody.rows[rowIndex].cells[participantIndex];
@@ -172,6 +186,19 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             })
         })
+    }
+
+    function toggleBidInputVisibility(isVisible) {
+        const bidInput = document.getElementById('bid-input');
+        const submitButton = document.getElementById('submit-bid');
+        
+        if (isVisible) {
+            bidInput.style.display = 'block';
+            submitButton.style.display = 'block';
+        } else {
+            bidInput.style.display = 'none';
+            submitButton.style.display = 'none';
+        }
     }
 
     function updateNominationText(String) {
@@ -182,18 +209,14 @@ document.addEventListener("DOMContentLoaded", () => {
     function waitForNomination() {
         return new Promise((resolve) => {
             const playerCardsContainer = document.getElementById('player-cards');
-            
+
             const nominationHandler = (event) => {
                 if (event.target.matches('.nominate-button')) {
                     const playerId = Number(event.target.getAttribute('data-player-id'));
-                    const nominatedPlayer = dataset.find(dataset => dataset.id === playerId);
-                    const heading = document.querySelector('.nominated-player-display h1');
-                    heading.innerText = `${nominatedPlayer.player} | ${nominatedPlayer.team}`;
-                    const positions = document.querySelector('.nominated-player-display p');
-                    positions.innerText = nominatedPlayer.pos;
+                    handleNomination(playerId);
+                    resolve(playerId);
                     playerCardsContainer.removeEventListener('click', nominationHandler);
                     clearInterval(timer);
-                    resolve(playerId);
                 }
             };
     
@@ -201,7 +224,32 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    function handleNomination(playerId) {
+        if (playerId === null) {
+            const playerCardsContainer = document.getElementById('player-cards');
+            const topButton = playerCardsContainer.querySelector('.nominate-button:not([style*="display: none"])');
+            playerId = Number(topButton.getAttribute('data-player-id'));
+            console.log(`id: ${playerId}`);
+        }
+
+        const nominatedPlayer = dataset.find(dataset => dataset.id === playerId);
+        const heading = document.querySelector('.nominated-player-display h1');
+        heading.innerText = `${nominatedPlayer.player} | ${nominatedPlayer.team}`;
+        const positions = document.querySelector('.nominated-player-display p');
+        positions.innerText = nominatedPlayer.pos;
+
+        const playerCardsContainer = document.getElementById('player-cards');
+        const card = Array.from(playerCardsContainer.getElementsByClassName('nominate-button'))
+        .find(button => Number(button.getAttribute('data-player-id')) === playerId)
+        .closest('.card');
+
+        if (card) {
+            card.style.display = 'none';
+        }
+    }
+
     function startTimer(seconds) {
+        clearInterval(timer);
         let timeLeft = seconds;
         timer = setInterval(() => {
             if (timeLeft <= 0) {
@@ -219,21 +267,36 @@ document.addEventListener("DOMContentLoaded", () => {
         }, 1000);
     }
 
-    async function startBid(currentBidder) {
+    async function startBid(currentBidder, isNominator) {
         console.log(`Current bidder is ${currentBidder.name}`);
         const bid = document.getElementById('bid-input');
         const submitButton = document.getElementById('submit-bid');
         let submitted = false;
+        bid.value = isNominator ? 1 : 0;
 
         startTimer(BIDDING_TIME);
         
         return new Promise((resolve) => {
-            submitButton.onclick = () => {
-                const currentBidAmount = parseInt(bid.value) || 0;
+            const handleBidSubmit = () => {
+                const currentBidAmount = parseInt(bid.value) || (isNominator ? 1 :0);
                 console.log(currentBidAmount);
                 currentBidder.placeBid(currentBidAmount);
+                submitted = true;
+                clearTimeout(timeoutId);
                 resolve();
             };
+
+            const timeoutId = setTimeout(() => {
+                if (!submitted) {
+                    const currentBidAmount = parseInt(bid.value) || (isNominator ? 1 : 0);
+                    currentBidder.placeBid(currentBidAmount);
+                    console.log(currentBidAmount);
+                    submitted = true;
+                    resolve(); 
+                }
+            }, BIDDING_TIME * 1000);
+
+            submitButton.onclick = handleBidSubmit;
         });
     }
 
@@ -243,11 +306,12 @@ document.addEventListener("DOMContentLoaded", () => {
         }, { currentBid: -1 });
         winner.spent += winner.currentBid;
         winner.addPlayer(id, winner.currentBid);
-        console.log(winner);
+        console.log(`The winner is: ${winner.name}`);
+        const bid = document.getElementById('bid-input');
+        bid.value = 0;
     }
 
-    /* TODO: need to implement draft order
-             populate team divs in order
+    /* TODO: 
              non-GMs are bots
     */
 });
