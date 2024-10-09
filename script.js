@@ -26,7 +26,7 @@ document.addEventListener("DOMContentLoaded", () => {
         .catch(error => console.error('Error fetching player data:', error));
 
     const ROSTER_SIZE = 13;
-    const NOMINATION_TIME = 20;
+    const NOMINATION_TIME = 4;
     const BIDDING_TIME = 10;
     const TOTAL_BUDGET = 200;
     const leagueSizeSelect = document.getElementById('league-size');
@@ -92,14 +92,17 @@ document.addEventListener("DOMContentLoaded", () => {
         event.preventDefault();
 
         const leagueSize = parseInt(leagueSizeSelect.value);
-        const livePlayers = parseInt(livePlayersSelect.value);
+        const realPlayersCount = parseInt(livePlayersSelect.value);
         const total = leagueSize * ROSTER_SIZE;
 
         document.getElementById('settings-form').classList.add('hidden');
         document.getElementById('auction-interface').classList.remove('hidden');
 
         const participants = [];
-        const orderingParticipants = Array.from({length: leagueSize}, (_, i) => `Participant ${i + 1}`);
+        const realParticipants = Array.from({ length: realPlayersCount }, (_, i) => (`Player ${i + 1}`));
+        const botParticipants = Array.from({ length: (leagueSize - realPlayersCount) }, (_, i) => (`Bot ${i + 1}`));
+
+        const orderingParticipants = [...realParticipants, ...botParticipants];
         const randomizedOrder = randomizeArray(orderingParticipants);
         console.log("randomized order: ", randomizedOrder);
         for (let i = 0; i < randomizedOrder.length; i++) {
@@ -123,10 +126,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
         for (let i = 0; i < ROSTER_SIZE; i++) {
             for (let j = 0; j < array.length; j++) {
+                console.log('buh');
+                console.log(array[j]);
+                console.log('after');
                 updateNominationText(array[j].name);
                 startTimer(NOMINATION_TIME);
                 toggleBidInputVisibility(false);
-                /*const id = await waitForNomination();*/
                 const id = await Promise.race([waitForNomination(), 
                            new Promise((resolve) => setTimeout(() => resolve(null), NOMINATION_TIME * 1000))]);
                 
@@ -227,7 +232,9 @@ document.addEventListener("DOMContentLoaded", () => {
     function handleNomination(playerId) {
         if (playerId === null) {
             const playerCardsContainer = document.getElementById('player-cards');
-            const topButton = playerCardsContainer.querySelector('.nominate-button:not([style*="display: none"])');
+            const topVisibleCard = playerCardsContainer.querySelector('.card:not([style*="display: none"])');
+            const topButton = topVisibleCard.querySelector('.nominate-button');
+            if (topButton) console.log('found');
             playerId = Number(topButton.getAttribute('data-player-id'));
             console.log(`id: ${playerId}`);
         }
@@ -254,7 +261,6 @@ document.addEventListener("DOMContentLoaded", () => {
         timer = setInterval(() => {
             if (timeLeft <= 0) {
                 clearInterval(timer);
-                // Handle timer expiration (e.g., end of turn)
             } else {
                 timeLeft--;
                 const clock = document.querySelector('#timer p');
