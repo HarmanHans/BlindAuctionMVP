@@ -536,13 +536,11 @@ document.addEventListener("DOMContentLoaded", () => {
         return new Promise((resolve) => {
             const playerCardsContainer = document.getElementById('player-cards');
 
-
             if (isAi) {
                 clearInterval(timer);
                 resolve(null);
                 return;
             }
-
 
             const nominationHandler = (event) => {
                 if (event.target.matches('.nominate-button')) {
@@ -553,7 +551,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     clearInterval(timer);
                 }
             };
-
 
             playerCardsContainer.addEventListener('click', nominationHandler);
         });
@@ -578,28 +575,23 @@ document.addEventListener("DOMContentLoaded", () => {
             playerId = Number(topCard.getAttribute('data-player-id'));
         }
 
-
         const nominatedPlayer = dataset.find(dataset => dataset.id === playerId);
         const heading = document.querySelector('.nominated-player-display h1');
         heading.innerText = `${nominatedPlayer.player} | ${nominatedPlayer.team}`;
         const positions = document.querySelector('.nominated-player-display p');
         positions.innerText = nominatedPlayer.pos;
 
-
         const playerCardsContainer = document.getElementById('player-cards');
         const card = Array.from(playerCardsContainer.getElementsByClassName('nominate-button'))
         .find(button => Number(button.getAttribute('data-player-id')) === playerId)
         .closest('.card');
 
-
         if (card) {
             card.style.display = 'none';
         }
 
-
         return playerId;
     }
-
 
     function pickTopCard(playerCardsContainer) {
         const cards = playerCardsContainer.querySelectorAll('.card');
@@ -662,7 +654,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     currentBidder.placeBid(determineValue(currentBidder, id, isNominator));
                     submitted = true;
                     resolve();
-                }, 2000);
+                }, 5000);
                 return;
             });
         }
@@ -841,7 +833,6 @@ document.addEventListener("DOMContentLoaded", () => {
         if (isNominator && totalScore < 1) {
             totalScore = 1;
         }
-        console.log('totalScore: ' + totalScore);
 
         let worth = Math.round(Math.min(totalScore, max_value));
         return Math.min(worth, currentBidder.maxBid);
