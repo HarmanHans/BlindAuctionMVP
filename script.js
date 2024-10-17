@@ -1,6 +1,10 @@
 /**
- * @fileoverview Description of file, its uses and information
- * about its dependencies.
+ * @fileoverview This file contains the logic for the auction bidding process.
+ * It handles, user and bot nominations, bidding, updates UI, and utilizes a
+ * json file to insert player data.
+ * 
+ * Dependencies:
+ * - playerData.json (contains stats of all NBA players)
  * @package
  */
 
@@ -39,7 +43,23 @@ document.addEventListener("DOMContentLoaded", () => {
     let currentSortOrder = new Array(11).fill(false);
     let timer;
 
+    /**
+     * Represents a participant in the auction, either a human or an AI.
+     * 
+     * This class manages the participant's bidding, budget, and roster,
+     * along with their cumulative statistics. Participants can place bids,
+     * winning bids adds players to their roster, and their performance is tracked 
+     * during the auction.
+     * 
+     * @class
+     */
     class Participant {
+        /**
+         * Creates an instance of Participant.
+         * 
+         * @param {string} name - The name of the participant.
+         * @param {boolean} [isAi=false] - Indicates if the participant is an AI.
+         */
         constructor(name, isAi = false) {
             this.name = name;
             this.spent = 0;
@@ -71,17 +91,20 @@ document.addEventListener("DOMContentLoaded", () => {
             };
         }
 
+        /**
+         * Determines approximately the biggest amount a bot will bid on any player.
+         * 
+         * @returns {number} A randomly assigned maximum bid.
+         */
         assignAggression() {
             const aggressionLevels = [43, 55, 65, 72];
             const rand = Math.floor(Math.random() * aggressionLevels.length);
             return aggressionLevels[rand];
         }
 
-
         get playersLeft() {
             return ROSTER_SIZE - this.draftees;
         }
-
 
         get maxBid() {
             return this.budget - this.spent - this.playersLeft;
@@ -146,7 +169,15 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-
+    /**
+     * Toggles the visibility of the roster and stats containers based on the state of the toggle switch.
+     * 
+     * When the toggle switch is checked, the roster container is hidden, and the stats container is displayed.
+     * When unchecked, the roster container is shown, and the stats container is hidden.
+     * 
+     * @event change
+     * @param {Event} event - The change event triggered by the toggle switch.
+     */
     document.getElementById('toggle-switch').addEventListener('change', function() {
         const rosterContainer = document.getElementById('roster-container');
         const statsContainer = document.getElementById('stats-container');
@@ -177,7 +208,14 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-
+    /**
+     * Handles the submission of the auction settings form.
+     * 
+     * This function takes the league settings input by the user and initializes them. This includes the number 
+     * of total participants, how many are bots vs. not, it generates the nomination order, and then starts the bidding process.
+     * 
+     * @param {Event} event - The submit event triggered by the form.
+     */
     document.getElementById('auction-settings').addEventListener('submit', function(event) {
         event.preventDefault();
 
@@ -217,7 +255,19 @@ document.addEventListener("DOMContentLoaded", () => {
         return array;
     }
 
-
+    /**
+     * Starts the auction process for the given array of participants.
+     * 
+     * This asynchronous function initializes the draft and stats tables, then 
+     * iterates through each round of nominations until each roster is full. 
+     * It handles both human and AI participants, manages timers for nominations, 
+     * and determines the highest bid for each nominated player.
+     * 
+     * @param {Array<Participant>} array - An array of Participant objects 
+     *                                      representing the auction participants.
+     * @returns {Promise<void>} A promise that resolves when the auction has 
+     *                          completed.
+     */
     async function startAuction(array) {
         let round = 1;
         initializeDraftTable(array);
@@ -312,7 +362,14 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-
+    /**
+     * Sorts the stats table in ascending or descending order based on which column the user selects.
+     * By default, the stat table is sorted highest to lowest in team ranking.
+     * 
+     * @param {Array<Participant>} participants - The array of Participant objects to be sorted.
+     * @param {number} columnIndex - The index of the column to sort by, corresponding 
+     *                               to the keys in the sortingKeyMap. 
+     */
     function sortTable(participants, columnIndex) {
         const sortingKeyMap = {
             0: 'name',
@@ -376,7 +433,15 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-
+    /**
+     * Compares the rosters of players head to head. The more teams a player's roster outranks others (based on
+     * last year's stats), the higher the team will be ranked.
+     * 
+     * 
+     * @param {Array<Participant>} participants - the array of Participant whose rosters will 
+     *                                            be compared head to head. 
+     * @returns {Array<Participant>} - the sorted array of Participants ranked by their strength in head to head.
+     */
     function calculateHeadToHeadPoints(participants) {
         let sortedParticipants = [...participants];
         sortedParticipants.forEach(team => {
@@ -495,7 +560,18 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-
+    /**
+     * Handles the nomination of a player during the auction process.
+     * 
+     * If no player ID is provided, the function picks the top card from the 
+     * player cards container. It then retrieves the nominated player's details 
+     * from the dataset, updates the displayed player information, and hides 
+     * the corresponding nomination button on the UI.
+     * 
+     * @param {number|null} playerId - The ID of the nominated player. If null, 
+     *                                 the function picks the top player card.
+     * @returns {number} - The ID of the nominated player.
+     */
     function handleNomination(playerId) {
         if (playerId === null) {
             const playerCardsContainer = document.getElementById('player-cards');
@@ -558,7 +634,19 @@ document.addEventListener("DOMContentLoaded", () => {
         }, 1000);
     }
 
-
+    /**
+     * Initiates the bidding process for a given bidder and player.
+     *
+     * The function updates the UI with the current bidder's name, sets the
+     * initial bid value based on whether the current bidder is the nominator,
+     * and handles both AI and human bidders. It sets a timer for the bidding
+     * duration and resolves a promise once a bid is submitted.
+     *
+     * @param {Participant} currentBidder - The participant currently placing the bid.
+     * @param {number} id - The ID of the player being bid on.
+     * @param {boolean} isNominator - Indicates whether the current bidder is the nominator.
+     * @returns {Promise<void>} - A promise that resolves when the bidding process is complete.
+     */
     async function startBid(currentBidder, id, isNominator) {
         updateUpperText(currentBidder.name, "bid");
         const bid = document.getElementById('bid-input');
@@ -606,7 +694,20 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-
+    /**
+     * Determines the bidding value spent by AI for a player based on various factors, 
+     * including the current bidder's stats, aggression, and league size.
+     *
+     * The function calculates a score that reflects the player's value to 
+     * the current bidder, taking into account performance metrics and other 
+     * contextual factors. It also ensures the calculated value does not exceed 
+     * the current bidder's maximum bid.
+     *
+     * @param {Participant} currentBidder - The AI determining the bid value.
+     * @param {number} id - The ID of the player for whom the bid value is being determined.
+     * @param {boolean} isNominator - Indicates if the current bidder is the nominator.
+     * @returns {number} - The calculated bidding value for the player, capped at the current bidder's max bid.
+     */
     function determineValue(currentBidder, id, isNominator) {
         if (currentBidder.draftees == ROSTER_SIZE) return 0;
 
@@ -736,52 +837,53 @@ document.addEventListener("DOMContentLoaded", () => {
             totalScore /= 15;
         }
 
-
         if (player.tos <= good_tos && player.totalScore >= 10) {
             totalScore += 1;
         }
 
-
-        /*
         if (player.games < 55) {
-        totalScore *= 0.8;}
-        */
-
+        totalScore *= 0.8;
+        }
 
         if (isNominator && totalScore < 1) {
             totalScore = 1;
         }
         console.log('totalScore: ' + totalScore);
 
-
         let worth = Math.round(Math.min(totalScore, max_value));
         console.log('worth: ' + worth);
         return Math.min(worth, currentBidder.maxBid);
     }
 
-
+    /**
+     * Evaluates the contribution of a specific stat using a logistic growth function.
+     *
+     * The function calculates a grade for the stat based on its value compared 
+     * to a peak, players that are elite at a certain stat are valued highly, non-contributors
+     * are punished heavily in value and middling players have a more stable shift in value as their 
+     * contribution goes up.
+     *
+     * @param {number} stat - The current value of the statistic being evaluated.
+     * @param {number} peak - The maximum possible contribution value for the stat.
+     * @param {number} curve - The steepness of the curve; higher values result in 
+     *                         a sharper transition around the turning point.
+     * @param {number} turn - The point at which the contribution begins to rise 
+     *                        significantly.
+     * @returns {number} - The calculated grade for the contribution based on 
+     *                     the provided stat.
+     */
     function evaluateContribution(stat, peak, curve, turn) {
         const grade = peak / (1 + Math.exp(-curve * (stat - turn)));
         return grade;
     }
 
-
-    function simpleEval(stat, peak, cap) {
-        const grade = Math.min(cap, cap * (stat / peak));
-        return grade >= 10 ? grade : (10 / (10 - grade));
-    }
-
-
     function selectHighestBid(participants, id) {
         /*participants = randomizeArray(participants);*/
-        participants.forEach(participant => {
-            console.log('selecthighest: ' + participant.name);
-        });
 
+        const highestBid = Math.max(...participants.map(participant => participant.currentBid));
+        const highestBidders = participants.filter(participant => participant.currentBid === highestBid);
+        const winner = highestBidders[Math.floor(Math.random() * highestBidders.length)];
 
-        const winner = participants.reduce((accumulator, participant) => {
-            return participant.currentBid > accumulator.currentBid ? participant : accumulator;
-        }, { currentBid: -1 });
         winner.spent += winner.currentBid;
         winner.addPlayer(id, winner.currentBid);
         updateStatsTable(participants);
