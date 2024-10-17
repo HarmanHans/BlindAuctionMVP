@@ -237,7 +237,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const orderingParticipants = [...realParticipants, ...botParticipants];
         const randomizedOrder = randomizeArray(orderingParticipants);
-        console.log("randomized order: ", randomizedOrder);
         for (let i = 0; i < randomizedOrder.length; i++) {
             participants.push(randomizedOrder[i]);
         }
@@ -581,7 +580,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
         const nominatedPlayer = dataset.find(dataset => dataset.id === playerId);
-        console.log(nominatedPlayer.player);
         const heading = document.querySelector('.nominated-player-display h1');
         heading.innerText = `${nominatedPlayer.player} | ${nominatedPlayer.team}`;
         const positions = document.querySelector('.nominated-player-display p');
@@ -713,7 +711,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
         let leagueMultiplier = 1;
-        console.log('name: ' + currentBidder.name);
 
 
         if (currentBidder.aggression < 55 && leagueSize <= 12) {
@@ -727,10 +724,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const leagueAggression = Math.round(Math.pow(0.04911 * leagueSize, 2) - (0.3964 * leagueSize)
         + (currentBidder.aggression * leagueMultiplier));
-
-
-        console.log('aggression: ' + leagueAggression);
-
 
         const budgetFactor = (TOTAL_BUDGET - currentBidder.spent) / TOTAL_BUDGET;
         const rosterFactor = (ROSTER_SIZE - currentBidder.draftees) / ROSTER_SIZE;
@@ -851,7 +844,6 @@ document.addEventListener("DOMContentLoaded", () => {
         console.log('totalScore: ' + totalScore);
 
         let worth = Math.round(Math.min(totalScore, max_value));
-        console.log('worth: ' + worth);
         return Math.min(worth, currentBidder.maxBid);
     }
 
