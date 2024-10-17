@@ -34,8 +34,8 @@ document.addEventListener("DOMContentLoaded", () => {
         .catch(error => console.error('Error fetching player data:', error));
 
     const ROSTER_SIZE = 13;
-    const NOMINATION_TIME = 2;
-    const BIDDING_TIME = 2;
+    const NOMINATION_TIME = 20;
+    const BIDDING_TIME = 20;
     const TOTAL_BUDGET = 200;
     const leagueSizeSelect = document.getElementById('league-size');
     const livePlayersSelect = document.getElementById('live-players');
