@@ -25,8 +25,8 @@ body {
 
 
 .timer {
-    width: 50px;  
-    height: 50px; 
+    width: 50px;
+    height: 50px;
     background-color: #007BFF;
     color: white;
     display: flex;
@@ -40,8 +40,8 @@ body {
     flex-direction: column;
     background: black;
     top: 0;
-    position: absolute; 
-    border: 1px solid #ccc; 
+    position: absolute;
+    border: 1px solid #ccc;
     width: calc(100% - 400px);
     height: 200px;
     color: white;
@@ -49,7 +49,7 @@ body {
 
 .nominated-player-display h1 {
     margin: 0;
-    font-weight: bold; 
+    font-weight: bold;
     padding-top: 20px;
     padding-left: 25px;
 }
@@ -65,16 +65,16 @@ body {
 }
 
 .current-participant {
-    flex-grow: 1; 
-    margin-left: 20px; 
+    flex-grow: 1;
+    margin-left: 20px;
 }
 
 .draft-notification {
     position: absolute;
-    top: 200px; 
+    top: 200px;
     left: 0;
     width: 100%;
-    background-color: #007BFF; 
+    background-color: #007BFF;
     color: white;
     text-align: center;
     padding: 10px 0;
@@ -99,8 +99,126 @@ body {
     overflow-y: auto;
 }
 
-table {
+.toggle-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1em;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+    margin: 0 10px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 34px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: #2196F3;
+}
+
+input:checked + .slider:before {
+    transform: translateX(26px);
+}
+
+#toggle-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
     width: 100%;
+}
+
+#show-roster-label, #show-stats-label {
+    font-size: 14px;
+    color: #000;
+    margin: 0 10px;
+}
+
+input:checked ~ #show-roster-label {
+    opacity: 0.5;
+}
+
+input:checked ~ #show-stats-label {
+    opacity: 1;
+}
+
+#roster-table {
+    width: auto;
+    height: auto;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+#cumulative-table {
+    width: 100%;
+}
+
+#roster-table th, #roster-table td {
+    border: 1px solid #ccc;
+    padding: 10px;
+    min-width: 80px;
+    max-width: 100px;
+    min-height: 70px;
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#cumulative-table th, #cumulative-table td {
+    min-width: 40px;
+    max-width: 45px;
+    max-height: 35px;
+    font-size: 14px;
+}
+
+#roster-table th {
+    background-color: #f0f0f0;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+#roster-table tr {
+    height: 70px;
+}
+
+#roster-table, #cumulative-table {
+    max-width: 100%;
+    overflow-x: auto;
+}
+
+table {
+    width: auto;
     height: 100%;
     border-collapse: collapse;
     table-layout: fixed;
@@ -109,6 +227,8 @@ table {
 th, td {
     border: 1px solid #ccc;
     padding: 10px;
+    min-width: 80px;
+    max-width: 100px;
 }
 
 th {
@@ -119,8 +239,10 @@ th {
 }
 
 tr {
-    min-height: 39px;
+    min-height: 47px;
 }
+
+
 
 .player-cards {
     display: flex;

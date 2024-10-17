@@ -32,7 +32,7 @@
                 <option value="19">19</option>
                 <option value="20">20</option>
             </select>
-    
+
             <label for="live-players">Players in League:</label>
             <select id="live-players" required>
                 <option value="">Select Participant Amount</option>
@@ -42,14 +42,33 @@
     </div>
 
     <div id="team-selections" class="team-selections">
-        <table id="roster-table">
-            <thead>
-                <tr id="table-header"></tr>
-            </thead>
-            <tbody id="table-body"></tbody>
-        </table>
+        <div id="toggle-container">
+            <span id="show-roster-label">Show Roster</span>
+            <label class="switch">
+                <input type="checkbox" id="toggle-switch">
+                <span class="slider round"></span>
+            </label>
+            <span id="show-stats-label">Show Stats</span>
+        </div>
+
+        <div id="roster-container">
+            <table id="roster-table">
+                <thead>
+                    <tr id="table-header"></tr>
+                </thead>
+                <tbody id="table-body"></tbody>
+            </table>
+        </div>
+        <div id="stats-container" style="display: none;">
+            <table id="cumulative-table">
+                <thead>
+                    <tr id="stats-table-header"></tr>
+                </thead>
+                <tbody id="stats-table-body"></tbody>
+            </table>
+        </div>
     </div>
-    
+
     <div class="container hidden" id="auction-interface">
         <div id="nominee-display" class="nominee-display">
             <div id="timer" class="timer">
